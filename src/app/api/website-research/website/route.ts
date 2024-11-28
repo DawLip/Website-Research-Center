@@ -1,16 +1,15 @@
-import {client} from "../../mongodb"
+import { FindCursor, MongoClient, ServerApiVersion, WithId } from 'mongodb'
+import {mongo} from "../../mongodb"
 
-export async function GET(request: Request) {
-    const data=[]
-    try{
-        await client.connect()
-        const cursor = await client.db("Researches").collection("Websites Research").find()
+export async function GET(req: Request) {
+    const websites:Document[]=[]
+    await mongo(async (client:MongoClient)=>{
+        const cursor:FindCursor = await client.db("Researches").collection("Websites Research").find()
         for await (const doc of cursor){
-            data.push(doc)
+            websites.push(doc)
         }
-    }finally{
-        await client.close()
-    }
+    })
 
-    return Response.json({ message: 'Hello World', data })
+
+    return Response.json(websites)
 }
